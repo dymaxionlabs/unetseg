@@ -5,12 +5,20 @@ U-Net semantic segmentation for satellite imagery
 
 ## Description
 
-A longer description of your project goes here...
+A set of classes and CLI tools for training a semantic segmentation model based
+on the U-Net architecture, using Tensorflow and Keras.
 
+This implementation is tuned specifically for satellite imagery and other
+geospatial raster data.
 
-<!-- pyscaffold-notes -->
+## Contributing
 
-## Note
+Bug reports and pull requests are welcome on GitHub at the [issues
+page](https://github.com/dymaxionlabs/unetseg). This project is intended to be
+a safe, welcoming space for collaboration, and contributors are expected to
+adhere to the [Contributor Covenant](http://contributor-covenant.org) code of
+conduct.
 
-This project has been set up using PyScaffold 4.0.1. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+## License
+
+This project is licensed under Apache 2.0. Refer to [LICENSE.txt](LICENSE.txt).
