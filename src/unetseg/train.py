@@ -253,6 +253,7 @@ def preprocess_input(image, mask, *, config):
 
     # In case mask is binary (1 class),
     # make sure mask has shape (H, W, 1) and not (H, W).
+    image_ = image_.reshape(image_.shape[0], image_.shape[1], config.n_channels)
     mask_ = mask_.reshape(mask_.shape[0], mask_.shape[1], config.n_classes)
 
     return image_, mask_
