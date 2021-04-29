@@ -293,8 +293,11 @@ def build_data_generator(image_files, *, config, mask_dir):
 
             input, mask = preprocess_input(image=input, mask=mask, config=config)
 
-            batch_input.append(input)
-            batch_output.append(mask)
+            if not np.any(np.isnan(input)):
+                if not np.any(np.isnan(mask)):
+
+                    batch_input.append(input)
+                    batch_output.append(mask)
 
         # Return a tuple of (input, output) to feed the network
         batch_x = np.array(batch_input)
