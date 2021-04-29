@@ -27,8 +27,8 @@ import sys
 from unetseg import __version__
 
 __author__ = "Damián Silvani"
-__copyright__ = "Damián Silvani"
-__license__ = "MIT"
+__copyright__ = "Dymaxion Labs"
+__license__ = "apache-2.0"
 
 _logger = logging.getLogger(__name__)
 

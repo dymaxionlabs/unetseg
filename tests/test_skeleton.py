@@ -3,8 +3,8 @@ import pytest
 from unetseg.skeleton import fib, main
 
 __author__ = "Damián Silvani"
-__copyright__ = "Damián Silvani"
-__license__ = "MIT"
+__copyright__ = "Dymaxion Labs"
+__license__ = "apache-2.0"
 
 
 def test_fib():
