@@ -66,6 +66,7 @@ def predict(cfg):
                     img_.shape
                 )
                 img_ = resize(img_, (cfg.height, cfg.width))
+                img_ = img_.reshape(cfg.height, cfg.width, cfg.n_channels)
                 X_predict.append(img_)
                 X_profile.append(profile_)
 
