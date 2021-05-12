@@ -11,6 +11,7 @@ import os
 import sys
 import inspect
 import shutil
+import sphinx_rtd_theme
 
 # -- Path setup --------------------------------------------------------------
 
@@ -78,6 +79,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -115,7 +117,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "unetseg"
-copyright = "2021, Damián Silvani"
+copyright = "2021, Dymaxion Labs"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -168,7 +170,7 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -266,7 +268,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "unetseg Documentation", "Damián Silvani", "manual")
+    ("index", "user_guide.tex", "unetseg Documentation", "Dymaxion Labs", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
