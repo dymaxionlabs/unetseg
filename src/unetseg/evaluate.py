@@ -10,7 +10,14 @@ import matplotlib.pyplot as plt
 from unetseg.train import build_data_generator
 
 
-def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config):
+def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config, img_ch = 3):
+    
+    if train_config.n_channels < 4 :
+        img_ch = train_config.n_channels
+    else:
+        img_ch = 3
+    
+    
     images_dir = os.path.join(train_config.images_path, 'images')
     mask_dir = os.path.join(train_config.images_path, 'masks')
 
@@ -27,7 +34,7 @@ def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config):
                 _, ax = plt.subplots(nrows=1,
                                      ncols=train_config.n_classes + 1,
                                      figsize=fig_size)
-                ax[0].imshow(image[:,:,:train_config.n_channels])
+                ax[0].imshow(image[:,:,:img_ch])
                 for i in range(train_config.n_classes):
                     ax[i + 1].imshow(mask[:, :, i])
                 j += 1
@@ -37,8 +44,13 @@ def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config):
     plot_samples(plt, data_generator, num_samples)
     plt.show()
     
-def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config):
+def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_ch = 3):
 
+    if predict_config.n_channels < 4 :
+        img_ch = predict_config.n_channels
+    else:
+        img_ch = 3
+    
     images = [os.path.basename(f) for f in sorted(glob(os.path.join(predict_config.results_path, '*.tif')))]
 
     images = random.sample(images, num_samples)
@@ -55,7 +67,7 @@ def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config):
             fig, axes = plt.subplots(nrows=1, ncols=predict_config.n_classes + 1 , figsize=(20, 40))
 
 
-            axes[0].imshow(img_s2)
+            axes[0].imshow(img_s2[:,:,:img_ch])
             for c in range( predict_config.n_classes):
                 axes[1+c].imshow(np.squeeze(mask_[:,:,c]))
 
