@@ -27,6 +27,15 @@ _logger = logging.getLogger(__name__)
 #             real_h = h if whole else min(h, abs(height - i))
 #             yield Window(j, i, real_w, real_h), (pos_i, pos_j)
 
+def filter_by_max_prob(input_dir, output_dir, threshold):
+    shutil.rmtree(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
+    threshold = round(threshold * 255)
+   
+    files = glob(os.path.join(input_dir, '*'))
+    worker = partial(filter_chip, output_dir=output_dir, threshold=threshold)
+    map_with_processes(files, worker)
+
 
 def get_bounds_from_image_files(image_files):
     # scan input files
