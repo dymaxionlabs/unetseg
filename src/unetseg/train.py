@@ -35,6 +35,7 @@ from unetseg.utils import resize
 warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
 
+
 @attr.s
 class TrainConfig:
     images_path = attr.ib()
@@ -45,6 +46,7 @@ class TrainConfig:
     apply_image_augmentation = attr.ib(default=True)
     model_path = attr.ib(default="unet.h5")
     validation_split = attr.ib(default=0.1)
+    test_split = attr.ib(default=0.1)
     epochs = attr.ib(default=15)
     steps_per_epoch = attr.ib(default=2000)
     early_stopping_patience = attr.ib(default=3)
@@ -53,17 +55,21 @@ class TrainConfig:
     evaluate = attr.ib(default=True)
     class_weights = attr.ib(default=0)
 
+def weighted_binary_crossentropy(y_true, y_pred):
+    class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
+    return K.sum(class_loglosses * K.constant(cfg.class_weights))
 
 def mean_iou(y_true, y_pred):
     prec = []
     for t in np.arange(0.5, 1.0, 0.05):
         y_pred_ = tf.to_int32(y_pred > t)
-        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
+        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_,2)
         K.get_session().run(tf.local_variables_initializer())
         with tf.control_dependencies([up_opt]):
             score = tf.identity(score)
         prec.append(score)
     return K.mean(K.stack(prec), axis=0)
+
 
 
 def build_model(cfg):
@@ -222,7 +228,7 @@ def build_model(cfg):
     model.compile(
         optimizer=Adam(),
         loss=weighted_binary_crossentropy,
-        metrics=["accuracy", mean_iou],
+        metrics=[mean_iou]
     )
 
     return model
@@ -322,20 +328,30 @@ def train(cfg):
     # Split dataset by shuffling and taking the first N elements for validation,
     # and the rest for training.
     np.random.shuffle(all_images)
-    n_val = round(cfg.validation_split * len(all_images))
-    val_images, train_images = all_images[:n_val], all_images[n_val:]
+    
+    
+    n_test = round(cfg.test_split * len(all_images))
+    n_val = round(cfg.validation_split * (len(all_images)-n_test) )
+    
+    test_images, all_train_images = all_images[:n_test], all_images[n_test:]
+    val_images, train_images = all_train_images[:n_val], all_train_images[n_val:]
+    
     print("Num. training images:", len(train_images))
     print("Num. validation images:", len(val_images))
-
+    print("Num. test images:", len(test_images))
+    
     if not train_images:
         raise RuntimeError("train_images is empty")
     if not val_images:
         raise RuntimeError("val_images is empty")
+    if not test_images:
+        raise RuntimeError("test_images is empty")
 
     mask_dir = os.path.join(cfg.images_path, "masks")
     train_generator = build_data_generator(train_images, config=cfg, mask_dir=mask_dir)
     val_generator = build_data_generator(val_images, config=cfg, mask_dir=mask_dir)
-
+    test_generator = build_data_generator(test_images, config=cfg, mask_dir=mask_dir)
+    
     # Make sure weights dir exist
     os.makedirs(os.path.dirname(cfg.model_path), exist_ok=True)
 
@@ -356,15 +372,14 @@ def train(cfg):
     # Save model
     model.save(cfg.model_path)
 
-    # Evaluate model on validation set
+    # Evaluate model on test set
     if cfg.evaluate:
         scores = model.evaluate_generator(
-            val_generator, steps=len(val_images) // cfg.batch_size
+            test_generator, steps=len(test_images) // cfg.batch_size
         )
-        loss, accuracy, mean_iou = scores
-        print("*** Final validation metrics ***")
+        loss, mean_iou = scores
+        print("*** Final  metrics ***")
         print("Loss:", loss)
-        print("Accuracy:", accuracy)
         print("Mean IoU:", mean_iou)
 
     return results
