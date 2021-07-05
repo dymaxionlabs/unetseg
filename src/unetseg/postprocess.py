@@ -28,8 +28,6 @@ _logger = logging.getLogger(__name__)
 #             yield Window(j, i, real_w, real_h), (pos_i, pos_j)
 
 
-
-
 def get_bounds_from_image_files(image_files):
     # scan input files
     xs = []
