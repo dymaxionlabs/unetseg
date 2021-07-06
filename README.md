@@ -1,6 +1,8 @@
 _This digital tool is part of the catalog of tools of the **Inter-American Development Bank**. You can learn more about the IDB initiative at [code.iadb.org](https://code.iadb.org)_
 
-<br>
+<p align="center">
+  <img height=200 src="https://user-images.githubusercontent.com/71611391/124545932-42fa5380-de00-11eb-932e-a5af36d3bbfb.png">
+</p>
 
 <h1 align="center">unetseg</h1>
 
@@ -48,4 +50,4 @@ conduct.
 
 ## :page_facing_up: License
 
-This project is licensed under Apache 2.0. Refer to [LICENSE.txt](LICENSE.txt) for more information.
+This project is licensed under Apache 2.0. Refer to [LICENSE.txt](LICENSE.txt).
