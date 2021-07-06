@@ -11,9 +11,16 @@ _This digital tool is part of the catalog of tools of the **Inter-American Devel
 </p>
 
 <p align="center">
-  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
-  <a href="https://github.com/dymaxionlabs/unetseg/releases"><img src="https://img.shields.io/badge/version-0.1.1-orange"></a>
+  <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/dymaxionlabs/unetseg"></a>
+  <a href="https://github.com/dymaxionlabs/unetseg/releases"><img src="https://img.shields.io/github/v/tag/dymaxionlabs/unetseg"></a>
   <a href="https://sonarcloud.io/dashboard?id=dymaxionlabs_unetseg"><img src="https://sonarcloud.io/api/project_badges/measure?project=dymaxionlabs_unetseg&metric=alert_status"></a>
+</p>
+
+<p  align="center"> •
+  <a  href="#information_source-description">Description</a> •
+  <a  href="#handshake-contributing">Contributing</a> •
+  <a  href="#man_technologist-authors">Authors</a> •
+  <a  href="#page_facing_up-license">License</a> •
 </p>
 
 <br>

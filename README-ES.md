@@ -11,9 +11,16 @@ _Esta herramienta digital forma parte del catálogo de herramientas del **Banco 
 </p>
 
 <p align="center">
-  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
-  <a href="https://github.com/dymaxionlabs/unetseg/releases"><img src="https://img.shields.io/badge/version-0.1.1-orange"></a>
+  <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/dymaxionlabs/unetseg"></a>
+  <a href="https://github.com/dymaxionlabs/unetseg/releases"><img src="https://img.shields.io/github/v/tag/dymaxionlabs/unetseg"></a>
   <a href="https://sonarcloud.io/dashboard?id=dymaxionlabs_unetseg"><img src="https://sonarcloud.io/api/project_badges/measure?project=dymaxionlabs_unetseg&metric=alert_status"></a>
+</p>
+
+<p  align="center"> •
+  <a  href="#information_source-descripción">Descripción</a> •
+  <a  href="#handshake-contribuyendo">Contribuyendo</a> •
+  <a  href="#man_technologist-autores">Autores</a> •
+  <a  href="#page_facing_up-licencia">Licencia</a> •
 </p>
 
 <br>
