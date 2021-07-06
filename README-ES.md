@@ -1,6 +1,8 @@
 _Esta herramienta digital forma parte del catálogo de herramientas del **Banco Interamericano de Desarrollo**. Puedes conocer más sobre la iniciativa del BID en [code.iadb.org](https://code.iadb.org)_
 
-<br>
+<p align="center">
+  <img height=200 src="https://user-images.githubusercontent.com/71611391/124545932-42fa5380-de00-11eb-932e-a5af36d3bbfb.png">
+</p>
 
 <h1 align="center">unetseg</h1>
 
@@ -18,9 +20,9 @@ _Esta herramienta digital forma parte del catálogo de herramientas del **Banco 
 
 ## :information_source: Descripción
 
-Paquete de Python de la implementación de un modelo de _deep learning_ para segmentación semántica basada en la arquitectura U-Net. Sirve para cualquier caso de uso donde se quiera delimitar el contorno de un objeto de interés, y está especialmente afinado para imágenes multiespectrales de satelitales, aéreas y de drones, de distinta resolución espacial.
+Paquete de Python de la implementación de un modelo de _deep learning_ para segmentación semántica basada en la arquitectura U-Net. Utiliza [Tensorflow](https://www.tensorflow.org/) y [Keras](https://keras.io/) para definir y entrenar el modelo.
 
-Utiliza [Tensorflow](https://www.tensorflow.org/) y [Keras](https://keras.io/) para definir y entrenar el modelo.
+Sirve para cualquier caso de uso donde se quiera delimitar el contorno de un objeto de interés, y está especialmente afinado para imágenes multiespectrales de satelitales, aéreas y de drones, de distinta resolución espacial.
 
 <br>
 
@@ -42,4 +44,4 @@ Informes de bugs y pull requests son bienvenidos en GitHub en la [página de iss
 
 ## :page_facing_up: Licencia
 
-Este proyecto tiene licencia de Apache 2.0. Ver [LICENSE.txt](LICENSE.txt) para más información.
+Este proyecto tiene licencia de Apache 2.0. Ver [LICENSE.txt](LICENSE.txt).
