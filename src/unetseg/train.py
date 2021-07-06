@@ -53,7 +53,7 @@ class TrainConfig:
     batch_size = attr.ib(default=32)
     seed = attr.ib(default=None)
     evaluate = attr.ib(default=True)
-    class_weights = attr.ib(default=0)
+    class_weights = attr.ib(default=1)
 
 def weighted_binary_crossentropy(y_true, y_pred):
     class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
