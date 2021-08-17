@@ -19,7 +19,7 @@ class PredictConfig:
     images_path = attr.ib(default="")
     results_path = attr.ib(default="")
     batch_size = attr.ib(default=32)
-
+    model_architecture = attr.ib(default="unet")
     model_path = attr.ib(default="unet.h5")
     height = attr.ib(default=320)
     width = attr.ib(default=320)
@@ -75,7 +75,7 @@ def predict(cfg):
         preds_test_ = pred  # > 0.05
 
         preds_test_scaled_ = minmax_scale(
-            preds_test_.ravel(), feature_range=(0, 255)
+            preds_test_.ravel(), feature_range=(1, 255)
         ).reshape(preds_test_.shape)
 
         for i, img_path in enumerate(mini_group):

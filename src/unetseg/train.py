@@ -45,6 +45,7 @@ class TrainConfig:
     n_classes = attr.ib(default=1)
     apply_image_augmentation = attr.ib(default=True)
     model_path = attr.ib(default="unet.h5")
+    model_architecture = attr.ib(default="unet")
     validation_split = attr.ib(default=0.1)
     test_split = attr.ib(default=0.1)
     epochs = attr.ib(default=15)
@@ -70,9 +71,213 @@ def mean_iou(y_true, y_pred):
         prec.append(score)
     return K.mean(K.stack(prec), axis=0)
 
+def build_model_unetplusplus(cfg):
+    # NOTE: for now, classes are equally balanced
+    if cfg.class_weights == 0:
+        cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
+
+    growth_factor = 2
+   
+    droprate = 0.25
+    number_of_filters = 2
+    upconv = True
+    batch_size = cfg.batch_size
+  
+    def conv2d(filters: int):
+        return Conv2D(filters=filters,
+                  kernel_size=(3, 3),
+                  padding='same')
 
 
-def build_model(cfg):
+    def conv2dtranspose(filters: int):
+        return Conv2DTranspose(filters=filters,
+                           kernel_size=(2, 2),
+                           strides=(2, 2),
+                           padding='same')
+
+
+    model_input = Input((cfg.height, cfg.width, cfg.n_channels))
+    x00 = conv2d(filters=int(16 * number_of_filters))(model_input)
+    x00 = BatchNormalization()(x00)
+    x00 = LeakyReLU(0.01)(x00)
+    x00 = Dropout(0.2)(x00)
+    x00 = conv2d(filters=int(16 * number_of_filters))(x00)
+    x00 = BatchNormalization()(x00)
+    x00 = LeakyReLU(0.01)(x00)
+    x00 = Dropout(0.2)(x00)
+    p0 = MaxPooling2D(pool_size=(2, 2))(x00)
+
+    x10 = conv2d(filters=int(32 * number_of_filters))(p0)
+    x10 = BatchNormalization()(x10)
+    x10 = LeakyReLU(0.01)(x10)
+    x10 = Dropout(0.2)(x10)
+    x10 = conv2d(filters=int(32 * number_of_filters))(x10)
+    x10 = BatchNormalization()(x10)
+    x10 = LeakyReLU(0.01)(x10)
+    x10 = Dropout(0.2)(x10)
+    p1 = MaxPooling2D(pool_size=(2, 2))(x10)
+
+    x01 = conv2dtranspose(int(16 * number_of_filters))(x10)
+    x01 = concatenate([x00, x01])
+    x01 = conv2d(filters=int(16 * number_of_filters))(x01)
+    x01 = BatchNormalization()(x01)
+    x01 = LeakyReLU(0.01)(x01)
+    x01 = conv2d(filters=int(16 * number_of_filters))(x01)
+    x01 = BatchNormalization()(x01)
+    x01 = LeakyReLU(0.01)(x01)
+    x01 = Dropout(0.2)(x01)
+
+    x20 = conv2d(filters=int(64 * number_of_filters))(p1)
+    x20 = BatchNormalization()(x20)
+    x20 = LeakyReLU(0.01)(x20)
+    x20 = Dropout(0.2)(x20)
+    x20 = conv2d(filters=int(64 * number_of_filters))(x20)
+    x20 = BatchNormalization()(x20)
+    x20 = LeakyReLU(0.01)(x20)
+    x20 = Dropout(0.2)(x20)
+    p2 = MaxPooling2D(pool_size=(2, 2))(x20)
+
+    x11 = conv2dtranspose(int(16 * number_of_filters))(x20)
+    x11 = concatenate([x10, x11])
+    x11 = conv2d(filters=int(16 * number_of_filters))(x11)
+    x11 = BatchNormalization()(x11)
+    x11 = LeakyReLU(0.01)(x11)
+    x11 = conv2d(filters=int(16 * number_of_filters))(x11)
+    x11 = BatchNormalization()(x11)
+    x11 = LeakyReLU(0.01)(x11)
+    x11 = Dropout(0.2)(x11)
+
+    x02 = conv2dtranspose(int(16 * number_of_filters))(x11)
+    x02 = concatenate([x00, x01, x02])
+    x02 = conv2d(filters=int(16 * number_of_filters))(x02)
+    x02 = BatchNormalization()(x02)
+    x02 = LeakyReLU(0.01)(x02)
+    x02 = conv2d(filters=int(16 * number_of_filters))(x02)
+    x02 = BatchNormalization()(x02)
+    x02 = LeakyReLU(0.01)(x02)
+    x02 = Dropout(0.2)(x02)
+
+    x30 = conv2d(filters=int(128 * number_of_filters))(p2)
+    x30 = BatchNormalization()(x30)
+    x30 = LeakyReLU(0.01)(x30)
+    x30 = Dropout(0.2)(x30)
+    x30 = conv2d(filters=int(128 * number_of_filters))(x30)
+    x30 = BatchNormalization()(x30)
+    x30 = LeakyReLU(0.01)(x30)
+    x30 = Dropout(0.2)(x30)
+    p3 = MaxPooling2D(pool_size=(2, 2))(x30)
+
+    x21 = conv2dtranspose(int(16 * number_of_filters))(x30)
+    x21 = concatenate([x20, x21])
+    x21 = conv2d(filters=int(16 * number_of_filters))(x21)
+    x21 = BatchNormalization()(x21)
+    x21 = LeakyReLU(0.01)(x21)
+    x21 = conv2d(filters=int(16 * number_of_filters))(x21)
+    x21 = BatchNormalization()(x21)
+    x21 = LeakyReLU(0.01)(x21)
+    x21 = Dropout(0.2)(x21)
+
+    x12 = conv2dtranspose(int(16 * number_of_filters))(x21)
+    x12 = concatenate([x10, x11, x12])
+    x12 = conv2d(filters=int(16 * number_of_filters))(x12)
+    x12 = BatchNormalization()(x12)
+    x12 = LeakyReLU(0.01)(x12)
+    x12 = conv2d(filters=int(16 * number_of_filters))(x12)
+    x12 = BatchNormalization()(x12)
+    x12 = LeakyReLU(0.01)(x12)
+    x12 = Dropout(0.2)(x12)
+
+    x03 = conv2dtranspose(int(16 * number_of_filters))(x12)
+    x03 = concatenate([x00, x01, x02, x03])
+    x03 = conv2d(filters=int(16 * number_of_filters))(x03)
+    x03 = BatchNormalization()(x03)
+    x03 = LeakyReLU(0.01)(x03)
+    x03 = conv2d(filters=int(16 * number_of_filters))(x03)
+    x03 = BatchNormalization()(x03)
+    x03 = LeakyReLU(0.01)(x03)
+    x03 = Dropout(0.2)(x03)
+
+    m = conv2d(filters=int(256 * number_of_filters))(p3)
+    m = BatchNormalization()(m)
+    m = LeakyReLU(0.01)(m)
+    m = conv2d(filters=int(256 * number_of_filters))(m)
+    m = BatchNormalization()(m)
+    m = LeakyReLU(0.01)(m)
+    m = Dropout(0.2)(m)
+
+    x31 = conv2dtranspose(int(128 * number_of_filters))(m)
+    x31 = concatenate([x31, x30])
+    x31 = conv2d(filters=int(128 * number_of_filters))(x31)
+    x31 = BatchNormalization()(x31)
+    x31 = LeakyReLU(0.01)(x31)
+    x31 = conv2d(filters=int(128 * number_of_filters))(x31)
+    x31 = BatchNormalization()(x31)
+    x31 = LeakyReLU(0.01)(x31)
+    x31 = Dropout(0.2)(x31)
+
+    x22 = conv2dtranspose(int(64 * number_of_filters))(x31)
+    x22 = concatenate([x22, x20, x21])
+    x22 = conv2d(filters=int(64 * number_of_filters))(x22)
+    x22 = BatchNormalization()(x22)
+    x22 = LeakyReLU(0.01)(x22)
+    x22 = conv2d(filters=int(64 * number_of_filters))(x22)
+    x22 = BatchNormalization()(x22)
+    x22 = LeakyReLU(0.01)(x22)
+    x22 = Dropout(0.2)(x22)
+
+    x13 = conv2dtranspose(int(32 * number_of_filters))(x22)
+    x13 = concatenate([x13, x10, x11, x12])
+    x13 = conv2d(filters=int(32 * number_of_filters))(x13)
+    x13 = BatchNormalization()(x13)
+    x13 = LeakyReLU(0.01)(x13)
+    x13 = conv2d(filters=int(32 * number_of_filters))(x13)
+    x13 = BatchNormalization()(x13)
+    x13 = LeakyReLU(0.01)(x13)
+    x13 = Dropout(0.2)(x13)
+
+    x04 = conv2dtranspose(int(16 * number_of_filters))(x13)
+    x04 = concatenate([x04, x00, x01, x02, x03], axis=3)
+    x04 = conv2d(filters=int(16 * number_of_filters))(x04)
+    x04 = BatchNormalization()(x04)
+    x04 = LeakyReLU(0.01)(x04)
+    x04 = conv2d(filters=int(16 * number_of_filters))(x04)
+    x04 = BatchNormalization()(x04)
+    x04 = LeakyReLU(0.01)(x04)
+    x04 = Dropout(0.2)(x04)
+
+    output = Conv2D(cfg.n_classes, kernel_size=(1, 1), activation='sigmoid')(x04) 
+
+    model = Model(inputs=[model_input], outputs=[output])
+    
+    def weighted_binary_crossentropy(y_true, y_pred):
+        class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
+        return K.sum(class_loglosses * K.constant(cfg.class_weights))
+    
+    def mean_iou(y_true, y_pred):
+        prec = []
+        for t in np.arange(0.5, 1.0, 0.05):
+            y_pred_ = tf.to_int32(y_pred > t)
+            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_,cfg.n_classes)
+            K.get_session().run(tf.local_variables_initializer())
+            with tf.control_dependencies([up_opt]):
+                score = tf.identity(score)
+            prec.append(score)
+        return K.mean(K.stack(prec), axis=0)
+
+  
+
+    model.compile(
+        optimizer=Adam(lr=0.0005),
+        loss=weighted_binary_crossentropy,
+        metrics=[mean_iou],
+    )
+    
+
+
+    return model
+
+
+def build_model_unet(cfg):
     # NOTE: for now, classes are equally balanced
     if cfg.class_weights == 0:
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
@@ -319,8 +524,19 @@ def train(cfg):
         random.seed = cfg.seed
         np.random.seed = cfg.seed
 
-    model = build_model(cfg)
-    print(model.summary())
+        
+    if cfg.model_architecture == "unet":
+        model = build_model_unet(cfg)
+        print(model.summary())
+    else if cfg.model_architecture == "unetplusplus":
+        model = build_model_unetplusplus(cfg)
+        print(model.summary())
+    else: 
+        print ("no model architecture was set so default UNet model will be use")
+        model = build_model_unet(cfg)
+        print(model.summary())
+        
+    
 
     all_images = glob(os.path.join(cfg.images_path, "images", "*.tif"))
     print("All images:", len(all_images))
