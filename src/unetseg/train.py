@@ -25,9 +25,12 @@ from keras.layers import (
     MaxPooling2D,
     UpSampling2D,
     concatenate,
+    LeakyReLU,
 )
+
 from keras.models import Model
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
+#import keras.optimizers.Adam as Adam
 from sklearn.preprocessing import minmax_scale
 
 from unetseg.utils import resize
@@ -528,7 +531,7 @@ def train(cfg):
     if cfg.model_architecture == "unet":
         model = build_model_unet(cfg)
         print(model.summary())
-    else if cfg.model_architecture == "unetplusplus":
+    elif cfg.model_architecture == "unetplusplus":
         model = build_model_unetplusplus(cfg)
         print(model.summary())
     else: 
