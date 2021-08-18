@@ -29,7 +29,7 @@ from keras.layers import (
 )
 
 from keras.models import Model
-from tensorflow.keras.optimizers import Adam
+import keras.optimizers as opitimizer
 #import keras.optimizers.Adam as Adam
 from sklearn.preprocessing import minmax_scale
 
@@ -270,7 +270,7 @@ def build_model_unetplusplus(cfg):
   
 
     model.compile(
-        optimizer=Adam(lr=0.0005),
+        optimizer=opitimizer.Adam(lr=0.0005),
         loss=weighted_binary_crossentropy,
         metrics=[mean_iou],
     )
@@ -434,7 +434,7 @@ def build_model_unet(cfg):
  
 
     model.compile(
-        optimizer=Adam(),
+        optimizer=opitimizer.Adam(),
         loss=weighted_binary_crossentropy,
         metrics=[mean_iou]
     )
