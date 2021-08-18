@@ -29,8 +29,11 @@ from keras.layers import (
 )
 
 from keras.models import Model
-import keras.optimizers as opitimizer
+#import keras.optimizers as opitimizer
 #import keras.optimizers.Adam as Adam
+
+from tensorflow.keras.optimizers import Adam
+#import keras.optimizer.adam as opt
 from sklearn.preprocessing import minmax_scale
 
 from unetseg.utils import resize
@@ -270,7 +273,8 @@ def build_model_unetplusplus(cfg):
   
 
     model.compile(
-        optimizer=opitimizer.Adam(lr=0.0005),
+        optimizer= "adam",
+        #optimizer=Adam(),#tf.optimizers.Adam(lr=0.0005),
         loss=weighted_binary_crossentropy,
         metrics=[mean_iou],
     )
@@ -434,7 +438,8 @@ def build_model_unet(cfg):
  
 
     model.compile(
-        optimizer=opitimizer.Adam(),
+        optimizer= "adam",
+       # optimizer=Adam(),#tf.optimizers.Adam(),
         loss=weighted_binary_crossentropy,
         metrics=[mean_iou]
     )
