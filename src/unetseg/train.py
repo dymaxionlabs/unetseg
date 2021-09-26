@@ -22,24 +22,24 @@ from keras.layers import (
     Conv2DTranspose,
     Dropout,
     Input,
+    LeakyReLU,
     MaxPooling2D,
     UpSampling2D,
     concatenate,
-    LeakyReLU,
 )
-
 from keras.models import Model
-#import keras.optimizers as opitimizer
-#import keras.optimizers.Adam as Adam
 
-from tensorflow.keras.optimizers import Adam
-#import keras.optimizer.adam as opt
+# import keras.optimizer.adam as opt
 from sklearn.preprocessing import minmax_scale
+from tensorflow.keras.optimizers import Adam
 
 from unetseg.utils import resize
 
-warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
+# import keras.optimizers as opitimizer
+# import keras.optimizers.Adam as Adam
 
+
+warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
 
 @attr.s
@@ -62,20 +62,23 @@ class TrainConfig:
     evaluate = attr.ib(default=True)
     class_weights = attr.ib(default=0)
 
+
 def weighted_binary_crossentropy(y_true, y_pred):
     class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
     return K.sum(class_loglosses * K.constant(cfg.class_weights))
 
+
 def mean_iou(y_true, y_pred):
     prec = []
     for t in np.arange(0.5, 1.0, 0.05):
-        y_pred_ = tf.to_int32(y_pred > t)
-        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_,2)
+        y_pred_ = tf.cast(y_pred > t, tf.int32)
+        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
         K.get_session().run(tf.local_variables_initializer())
         with tf.control_dependencies([up_opt]):
             score = tf.identity(score)
         prec.append(score)
     return K.mean(K.stack(prec), axis=0)
+
 
 def build_model_unetplusplus(cfg):
     # NOTE: for now, classes are equally balanced
@@ -83,24 +86,19 @@ def build_model_unetplusplus(cfg):
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
 
     growth_factor = 2
-   
+
     droprate = 0.25
     number_of_filters = 2
     upconv = True
     batch_size = cfg.batch_size
-  
-    def conv2d(filters: int):
-        return Conv2D(filters=filters,
-                  kernel_size=(3, 3),
-                  padding='same')
 
+    def conv2d(filters: int):
+        return Conv2D(filters=filters, kernel_size=(3, 3), padding="same")
 
     def conv2dtranspose(filters: int):
-        return Conv2DTranspose(filters=filters,
-                           kernel_size=(2, 2),
-                           strides=(2, 2),
-                           padding='same')
-
+        return Conv2DTranspose(
+            filters=filters, kernel_size=(2, 2), strides=(2, 2), padding="same"
+        )
 
     model_input = Input((cfg.height, cfg.width, cfg.n_channels))
     x00 = conv2d(filters=int(16 * number_of_filters))(model_input)
@@ -251,35 +249,31 @@ def build_model_unetplusplus(cfg):
     x04 = LeakyReLU(0.01)(x04)
     x04 = Dropout(0.2)(x04)
 
-    output = Conv2D(cfg.n_classes, kernel_size=(1, 1), activation='sigmoid')(x04) 
+    output = Conv2D(cfg.n_classes, kernel_size=(1, 1), activation="sigmoid")(x04)
 
     model = Model(inputs=[model_input], outputs=[output])
-    
+
     def weighted_binary_crossentropy(y_true, y_pred):
         class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
         return K.sum(class_loglosses * K.constant(cfg.class_weights))
-    
+
     def mean_iou(y_true, y_pred):
         prec = []
         for t in np.arange(0.5, 1.0, 0.05):
-            y_pred_ = tf.to_int32(y_pred > t)
-            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_,cfg.n_classes)
+            y_pred_ = tf.cast(y_pred > t, tf.int32)
+            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, cfg.n_classes)
             K.get_session().run(tf.local_variables_initializer())
             with tf.control_dependencies([up_opt]):
                 score = tf.identity(score)
             prec.append(score)
         return K.mean(K.stack(prec), axis=0)
 
-  
-
     model.compile(
-        optimizer= "adam",
-        #optimizer=Adam(),#tf.optimizers.Adam(lr=0.0005),
+        optimizer="adam",
+        # optimizer=Adam(),#tf.optimizers.Adam(lr=0.0005),
         loss=weighted_binary_crossentropy,
         metrics=[mean_iou],
     )
-    
-
 
     return model
 
@@ -423,25 +417,23 @@ def build_model_unet(cfg):
     def weighted_binary_crossentropy(y_true, y_pred):
         class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
         return K.sum(class_loglosses * K.constant(cfg.class_weights))
-    
+
     def mean_iou(y_true, y_pred):
         prec = []
         for t in np.arange(0.5, 1.0, 0.05):
-            y_pred_ = tf.to_int32(y_pred > t)
-            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_,2)
+            y_pred_ = tf.cast(y_pred > t, tf.int32)
+            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
             K.get_session().run(tf.local_variables_initializer())
             with tf.control_dependencies([up_opt]):
                 score = tf.identity(score)
             prec.append(score)
         return K.mean(K.stack(prec), axis=0)
 
- 
-
     model.compile(
-        optimizer= "adam",
-       # optimizer=Adam(),#tf.optimizers.Adam(),
+        optimizer="adam",
+        # optimizer=Adam(),#tf.optimizers.Adam(),
         loss=weighted_binary_crossentropy,
-        metrics=[mean_iou]
+        metrics=[mean_iou],
     )
 
     return model
@@ -532,19 +524,16 @@ def train(cfg):
         random.seed = cfg.seed
         np.random.seed = cfg.seed
 
-        
     if cfg.model_architecture == "unet":
         model = build_model_unet(cfg)
         print(model.summary())
     elif cfg.model_architecture == "unetplusplus":
         model = build_model_unetplusplus(cfg)
         print(model.summary())
-    else: 
-        print ("no model architecture was set so default UNet model will be use")
+    else:
+        print("no model architecture was set so default UNet model will be use")
         model = build_model_unet(cfg)
         print(model.summary())
-        
-    
 
     all_images = glob(os.path.join(cfg.images_path, "images", "*.tif"))
     print("All images:", len(all_images))
@@ -552,18 +541,17 @@ def train(cfg):
     # Split dataset by shuffling and taking the first N elements for validation,
     # and the rest for training.
     np.random.shuffle(all_images)
-    
-    
+
     n_test = round(cfg.test_split * len(all_images))
-    n_val = round(cfg.validation_split * (len(all_images)-n_test) )
-    
+    n_val = round(cfg.validation_split * (len(all_images) - n_test))
+
     test_images, all_train_images = all_images[:n_test], all_images[n_test:]
     val_images, train_images = all_train_images[:n_val], all_train_images[n_val:]
-    
+
     print("Num. training images:", len(train_images))
     print("Num. validation images:", len(val_images))
     print("Num. test images:", len(test_images))
-    
+
     if not train_images:
         raise RuntimeError("train_images is empty")
     if not val_images:
@@ -575,7 +563,7 @@ def train(cfg):
     train_generator = build_data_generator(train_images, config=cfg, mask_dir=mask_dir)
     val_generator = build_data_generator(val_images, config=cfg, mask_dir=mask_dir)
     test_generator = build_data_generator(test_images, config=cfg, mask_dir=mask_dir)
-    
+
     # Make sure weights dir exist
     os.makedirs(os.path.dirname(cfg.model_path), exist_ok=True)
 
