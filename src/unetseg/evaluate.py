@@ -12,7 +12,6 @@ from unetseg.train import build_data_generator
 
 
 def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config, img_ch=3):
-
     if train_config.n_channels < 4:
         img_ch = train_config.n_channels
     else:
@@ -50,9 +49,8 @@ def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config, img_c
     plot_samples(plt, data_generator, num_samples)
     plt.show()
 
-def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_ch=3):
 
-    
+def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_ch=3):
 
     images = [
         os.path.basename(f)
@@ -64,37 +62,30 @@ def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_c
         try:
 
             if predict_config.n_channels < 3:
-    
-                img_s2 = tiff.imread(
-                os.path.join(predict_config.images_path, "images", img_file)
-                )
-             
 
+                img_s2 = tiff.imread(
+                    os.path.join(predict_config.images_path, "images", img_file)
+                )
 
                 img_s2 = minmax_scale(img_s2.ravel(), feature_range=(0, 255)).reshape(
-                img_s2.shape
+                    img_s2.shape
                 )
-                
-                
+
             else:
                 img_s2 = tiff.imread(
-                os.path.join(predict_config.images_path, "images", img_file)
-                )[:, :,:img_ch ]
-
-
+                    os.path.join(predict_config.images_path, "images", img_file)
+                )[:, :, :img_ch]
 
                 img_s2 = minmax_scale(img_s2.ravel(), feature_range=(0, 255)).reshape(
-                img_s2.shape
+                    img_s2.shape
                 )
-                
-            
-              
+
             # Prediccion
             mask_ = (
                 tiff.imread(os.path.join(predict_config.results_path, img_file)) / 255
             )
-            mask_ = np.rollaxis(mask_, 0, 3)  
-       
+            mask_ = np.rollaxis(mask_, 0, 3)
+
             mask_ = resize(
                 mask_,
                 (predict_config.height, predict_config.width, predict_config.n_classes),
@@ -105,8 +96,7 @@ def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_c
             fig, axes = plt.subplots(
                 nrows=1, ncols=predict_config.n_classes + 1, figsize=(20, 40)
             )
-            axes[0].imshow(img_s2)  
-               
+            axes[0].imshow(img_s2)
 
             for c in range(predict_config.n_classes):
                 axes[1 + c].imshow(np.squeeze(mask_[:, :, c]))
