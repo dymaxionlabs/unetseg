@@ -3,6 +3,7 @@ from itertools import zip_longest
 import cv2
 import keras
 import skimage.transform
+from keras.models import Model
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -12,7 +13,8 @@ def grouper(iterable, n, fillvalue=None):
     return zip_longest(*args, fillvalue=fillvalue)
 
 
-def load_model(model_path):
+def load_model(model_path: str) -> Model:
+    """Load model from ``model_path``"""
     return keras.models.load_model(model_path)
 
 

@@ -1,8 +1,8 @@
 import os
 import random
-import sys
 import warnings
 from glob import glob
+from typing import List, Tuple
 
 import albumentations as A
 import attr
@@ -10,12 +10,7 @@ import numpy as np
 import rasterio
 import tensorflow as tf
 from keras import backend as K
-from keras.callbacks import (
-    EarlyStopping,
-    ModelCheckpoint,
-    ReduceLROnPlateau,
-    TensorBoard,
-)
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import (
     BatchNormalization,
     Conv2D,
@@ -28,16 +23,9 @@ from keras.layers import (
     concatenate,
 )
 from keras.models import Model
-
-# import keras.optimizer.adam as opt
 from sklearn.preprocessing import minmax_scale
-from tensorflow.keras.optimizers import Adam
 
 from unetseg.utils import resize
-
-# import keras.optimizers as opitimizer
-# import keras.optimizers.Adam as Adam
-
 
 warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
@@ -63,12 +51,8 @@ class TrainConfig:
     class_weights = attr.ib(default=0)
 
 
-def weighted_binary_crossentropy(y_true, y_pred):
-    class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
-    return K.sum(class_loglosses * K.constant(cfg.class_weights))
-
-
 def mean_iou(y_true, y_pred):
+    """Calculate mean IoU metric."""
     prec = []
     for t in np.arange(0.5, 1.0, 0.05):
         y_pred_ = tf.cast(y_pred > t, tf.int32)
@@ -80,17 +64,30 @@ def mean_iou(y_true, y_pred):
     return K.mean(K.stack(prec), axis=0)
 
 
-def build_model_unetplusplus(cfg):
+def build_model_unetplusplus(cfg: TrainConfig) -> Model:
+    """
+    Builds a U-Net++ model.
+
+    Parameters
+    ----------
+    cfg : TrainConfig
+        Training configuration.
+
+    Returns
+    -------
+    Model
+        The U-Net++ model.
+
+    """
     # NOTE: for now, classes are equally balanced
     if cfg.class_weights == 0:
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
 
-    growth_factor = 2
-
-    droprate = 0.25
+    # growth_factor = 2
+    # droprate = 0.25
     number_of_filters = 2
-    upconv = True
-    batch_size = cfg.batch_size
+    # upconv = True
+    # batch_size = cfg.batch_size
 
     def conv2d(filters: int):
         return Conv2D(filters=filters, kernel_size=(3, 3), padding="same")
@@ -278,7 +275,21 @@ def build_model_unetplusplus(cfg):
     return model
 
 
-def build_model_unet(cfg):
+def build_model_unet(cfg: TrainConfig) -> Model:
+    """
+    Build U-Net model class.
+
+    Parameters
+    ----------
+    cfg : TrainConfig
+        Configuration for training.
+
+    Returns
+    -------
+    Model
+        U-Net model class.
+
+    """
     # NOTE: for now, classes are equally balanced
     if cfg.class_weights == 0:
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
@@ -439,7 +450,27 @@ def build_model_unet(cfg):
     return model
 
 
-def preprocess_input(image, mask, *, config):
+def preprocess_input(
+    image: np.ndarray, mask: np.ndarray, *, config: TrainConfig
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Preprocess input image and masks.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image.
+    mask : np.ndarray
+        Input mask.
+    config : TrainConfig
+        Training configuration.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        Preprocessed image and mask.
+
+    """
     # Scale image to 0-255 range
     image_ = minmax_scale(image.ravel(), feature_range=(0, 255)).reshape(image.shape)
     # Scale to 0-1 by dividing by 255 (we assume that mask has true values
@@ -471,14 +502,51 @@ def preprocess_input(image, mask, *, config):
     return image_, mask_
 
 
-def get_raster(image_path, n_channels=None):
+def get_raster(image_path: str, n_channels: int = None) -> np.ndarray:
+    """
+    Loads a raster image from a file.
+
+    Parameters
+    ----------
+    image_path : str
+        Path to the image file.
+    n_channels : int, optional
+        Number of channels in the image. If not specified, the number of channels
+        is inferred from the image file.
+
+    Returns
+    -------
+    np.ndarray
+        The loaded image.
+
+    """
     with rasterio.open(image_path) as src:
         if not n_channels:
             n_channels = src.count
         return np.dstack([src.read(b) for b in range(1, n_channels + 1)])
 
 
-def get_mask_raster(image_path, n_channels=None, *, mask_dir):
+def get_mask_raster(
+    image_path: str, n_channels: int = None, *, mask_dir: str
+) -> np.ndarray:
+    """
+    Get respective mask raster from image path.
+
+    Parameters
+    ----------
+    image_path : str
+        Path to image.
+    n_channels : int, optional
+        Number of channels in image. The default is None.
+    mask_dir : str, optional
+        Path to mask directory. The default is None.
+
+    Returns
+    -------
+    np.ndarray
+        Mask image.
+
+    """
     basename = os.path.basename(image_path)
     mask_path = os.path.join(mask_dir, basename)
     with rasterio.open(mask_path) as src:
@@ -487,7 +555,25 @@ def get_mask_raster(image_path, n_channels=None, *, mask_dir):
         return np.dstack([src.read(b) for b in range(1, n_channels + 1)])
 
 
-def build_data_generator(image_files, *, config, mask_dir):
+def build_data_generator(image_files: List[str], *, config: TrainConfig, mask_dir: str):
+    """
+    Build data generator based on a list of images and directory of binary masks.
+
+    Parameters
+    ----------
+    image_files : List[str]
+        List of paths to images.
+    config : TrainConfig
+        Configuration object.
+    mask_dir : str
+        Path to directory with binary masks.
+
+    Yields
+    ------
+    tuple
+        Tuple of image and mask batch.
+
+    """
     if not image_files:
         raise RuntimeError("image_files is empty")
 
@@ -519,7 +605,16 @@ def build_data_generator(image_files, *, config, mask_dir):
         yield batch_x, batch_y
 
 
-def train(cfg):
+def train(cfg: TrainConfig):
+    """
+    Performs training and evaluation of the model based on a configuration object.
+
+    Parameters
+    ----------
+    cfg : TrainConfig
+        Configuration object containing all the necessary parameters for training.
+
+    """
     if cfg.seed:
         random.seed = cfg.seed
         np.random.seed = cfg.seed

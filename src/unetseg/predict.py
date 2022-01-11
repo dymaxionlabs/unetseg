@@ -8,8 +8,8 @@ import rasterio
 from sklearn.preprocessing import minmax_scale
 from tqdm import tqdm
 
-from unetseg.train import TrainConfig, build_model_unet , build_model_unetplusplus
-from unetseg.utils import grouper, load_model, resize
+from unetseg.train import build_model_unet, build_model_unetplusplus
+from unetseg.utils import grouper, resize
 
 warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
@@ -28,8 +28,16 @@ class PredictConfig:
     class_weights = attr.ib(default=0)
 
 
+def predict(cfg: PredictConfig):
+    """
+    Performs inference based on a configuration object
 
-def predict(cfg):
+    Parameters
+    ----------
+    cfg : PredictConfig
+        Configuration object
+
+    """
     pat = os.path.join(cfg.images_path, "images/*.tif")
     predict_ids = glob(pat)
     print(f"Total images to predict ({pat}):", len(predict_ids))
@@ -48,19 +56,17 @@ def predict(cfg):
     # FIXME: Find a better way to load model (.load_model() did not work because
     # of the weighted_binary_crossentropy function).
     # build_model() only expects cfg to have: width, height, n_channels, n_classes
-    
+
     if cfg.model_architecture == "unet":
         model = build_model_unet(cfg)
-        #print(model.summary())
+        # print(model.summary())
     elif cfg.model_architecture == "unetplusplus":
         model = build_model_unetplusplus(cfg)
-        #print(model.summary())
+        # print(model.summary())
     else:
-        print ("no model architecture was set so default UNet model will be use")
+        print("no model architecture was set so default UNet model will be use")
         model = build_model_unet(cfg)
-        #print(model.summary())
-
-
+        # print(model.summary())
 
     model.load_weights(cfg.model_path)
 

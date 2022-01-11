@@ -8,10 +8,33 @@ import tifffile as tiff
 from skimage.transform import resize
 from sklearn.preprocessing import minmax_scale
 
-from unetseg.train import build_data_generator
+from unetseg.predict import PredictConfig
+from unetseg.train import TrainConfig, build_data_generator
 
 
-def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config, img_ch=3):
+def plot_data_generator(
+    num_samples: int = 3,
+    fig_size=(20, 10),
+    *,
+    train_config: TrainConfig,
+    img_ch: int = 3
+):
+    """
+    Plots some samples from a data generator.
+
+    Parameters
+    ----------
+    num_samples : int
+        Number of samples to plot.
+    fig_size : tuple
+        Figure size.
+    img_ch : int
+        Number of channels.
+    train_config : TrainConfig
+        Training configuration object.
+
+    """
+
     if train_config.n_channels < 4:
         img_ch = train_config.n_channels
     else:
@@ -50,7 +73,28 @@ def plot_data_generator(num_samples=3, fig_size=(20, 10), *, train_config, img_c
     plt.show()
 
 
-def plot_data_results(num_samples=3, fig_size=(20, 10), *, predict_config, img_ch=3):
+def plot_data_results(
+    num_samples: int = 3,
+    fig_size=(20, 10),
+    *,
+    predict_config: PredictConfig,
+    img_ch: int = 3
+):
+    """
+    Plots some samples from the results directory.
+
+    Parameters
+    ----------
+    num_samples : int
+        Number of samples to plot.
+    fig_size : tuple
+        Figure size.
+    img_ch : int
+        Number of channels.
+    predict_config : PredictConfig
+        Prediction onfiguration object.
+
+    """
 
     images = [
         os.path.basename(f)

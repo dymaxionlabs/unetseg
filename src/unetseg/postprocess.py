@@ -2,6 +2,7 @@ import logging
 import math
 import os
 from glob import glob
+from typing import List, Tuple
 
 import numpy as np
 import rasterio
@@ -12,24 +13,9 @@ from tqdm import tqdm
 
 _logger = logging.getLogger(__name__)
 
-# def sliding_windows(size, whole=False, step_size=None, *, bounds):
-#     """Slide a window of +size+ by moving it +step_size+ pixels"""
-#     width, height = abs(bounds[2] - bounds[0]), abs(bounds[3] - bounds[1])
-#     if not step_size:
-#         step_size = size
-#     w, h = size
-#     sw, sh = step_size
-#     end_i = height - h if whole else height
-#     end_j = width - w if whole else width
-#     for pos_i, i in enumerate(range(0, end_i, sh)):
-#         for pos_j, j in enumerate(range(0, end_j, sw)):
-#             real_w = w if whole else min(w, abs(width - j))
-#             real_h = h if whole else min(h, abs(height - i))
-#             yield Window(j, i, real_w, real_h), (pos_i, pos_j)
 
-
-def get_bounds_from_image_files(image_files):
-    # scan input files
+def get_bounds_from_image_files(image_files: List[str]) -> Tuple[float]:
+    """Get bounds from all images, and transform to pixels based on the affine transform"""
     xs = []
     ys = []
     for img_path in tqdm(image_files):
@@ -41,14 +27,16 @@ def get_bounds_from_image_files(image_files):
     return (dst_w, dst_s, dst_e, dst_n)
 
 
-def crop_image(img, margin_ratio):
+def crop_image(img: np.ndarray, margin_ratio: float) -> np.ndarray:
+    """Center crop an image, with a margin of ``margin_ratio``"""
     h, w = img.shape[0], img.shape[1]
     h_margin = math.floor(h * margin_ratio)
     w_margin = math.floor(w * margin_ratio)
     return img[h_margin:-h_margin, w_margin:-w_margin]
 
 
-def merge(images_dir, output_path, crop_margin_ratio=0.125):
+def merge(images_dir: str, output_path: str, crop_margin_ratio: float = 0.125):
+    """Merge all images in ``images_dir`` into a single image"""
     image_paths = glob(os.path.join(images_dir, "*.tif"))
     if not image_paths:
         raise RuntimeError("images_dir does not contain any .tif file")
@@ -86,9 +74,6 @@ def merge(images_dir, output_path, crop_margin_ratio=0.125):
     profile.update(
         width=output_width, height=output_height, transform=output_transform, tiled=True
     )
-
-    # import pdb
-    # pdb.set_trace()
 
     # Call rasterio.merge using windowed reading-writing
     # and a custom callable that center-crops image.
