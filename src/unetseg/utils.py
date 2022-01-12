@@ -1,9 +1,9 @@
 from itertools import zip_longest
 
 import cv2
-import keras
 import skimage.transform
-from keras.models import Model
+import tensorflow as tf
+from tensorflow.keras.models import Model
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -15,7 +15,7 @@ def grouper(iterable, n, fillvalue=None):
 
 def load_model(model_path: str) -> Model:
     """Load model from ``model_path``"""
-    return keras.models.load_model(model_path)
+    return tf.keras.models.load_model(model_path)
 
 
 def resize(image, size):

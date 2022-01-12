@@ -9,9 +9,9 @@ import attr
 import numpy as np
 import rasterio
 import tensorflow as tf
-from keras import backend as K
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import (
+from tensorflow.compat.v1.keras import backend as K
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import (
     BatchNormalization,
     Conv2D,
     Conv2DTranspose,
@@ -22,7 +22,7 @@ from keras.layers import (
     UpSampling2D,
     concatenate,
 )
-from keras.models import Model
+from tensorflow.keras.models import Model
 from sklearn.preprocessing import minmax_scale
 
 from unetseg.utils import resize
@@ -49,19 +49,6 @@ class TrainConfig:
     seed = attr.ib(default=None)
     evaluate = attr.ib(default=True)
     class_weights = attr.ib(default=0)
-
-
-def mean_iou(y_true, y_pred):
-    """Calculate mean IoU metric."""
-    prec = []
-    for t in np.arange(0.5, 1.0, 0.05):
-        y_pred_ = tf.cast(y_pred > t, tf.int32)
-        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([up_opt]):
-            score = tf.identity(score)
-        prec.append(score)
-    return K.mean(K.stack(prec), axis=0)
 
 
 def build_model_unetplusplus(cfg: TrainConfig) -> Model:
@@ -254,22 +241,11 @@ def build_model_unetplusplus(cfg: TrainConfig) -> Model:
         class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
         return K.sum(class_loglosses * K.constant(cfg.class_weights))
 
-    def mean_iou(y_true, y_pred):
-        prec = []
-        for t in np.arange(0.5, 1.0, 0.05):
-            y_pred_ = tf.cast(y_pred > t, tf.int32)
-            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
-            K.get_session().run(tf.local_variables_initializer())
-            with tf.control_dependencies([up_opt]):
-                score = tf.identity(score)
-            prec.append(score)
-        return K.mean(K.stack(prec), axis=0)
-
     model.compile(
         optimizer="adam",
         # optimizer=Adam(),#tf.optimizers.Adam(lr=0.0005),
         loss=weighted_binary_crossentropy,
-        metrics=[mean_iou],
+        metrics=[tf.keras.metrics.MeanIoU(num_classes=cfg.n_classes + 1)],
     )
 
     return model
@@ -429,22 +405,11 @@ def build_model_unet(cfg: TrainConfig) -> Model:
         class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
         return K.sum(class_loglosses * K.constant(cfg.class_weights))
 
-    def mean_iou(y_true, y_pred):
-        prec = []
-        for t in np.arange(0.5, 1.0, 0.05):
-            y_pred_ = tf.cast(y_pred > t, tf.int32)
-            score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
-            K.get_session().run(tf.local_variables_initializer())
-            with tf.control_dependencies([up_opt]):
-                score = tf.identity(score)
-            prec.append(score)
-        return K.mean(K.stack(prec), axis=0)
-
     model.compile(
         optimizer="adam",
         # optimizer=Adam(),#tf.optimizers.Adam(),
         loss=weighted_binary_crossentropy,
-        metrics=[mean_iou],
+        metrics=[tf.keras.metrics.MeanIoU(num_classes=cfg.n_classes + 1)],
     )
 
     return model
@@ -667,7 +632,8 @@ def train(cfg: TrainConfig):
     checkpoint = ModelCheckpoint(cfg.model_path, verbose=1, save_best_only=True)
     # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
     #                               patience=5, min_lr=0.001)
-    results = model.fit_generator(
+
+    results = model.fit(
         train_generator,
         epochs=cfg.epochs,
         steps_per_epoch=cfg.steps_per_epoch,
@@ -681,7 +647,7 @@ def train(cfg: TrainConfig):
 
     # Evaluate model on test set
     if cfg.evaluate:
-        scores = model.evaluate_generator(
+        scores = model.evaluate(
             test_generator, steps=len(test_images) // cfg.batch_size
         )
         loss, mean_iou = scores
