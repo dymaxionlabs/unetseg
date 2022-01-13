@@ -9,6 +9,7 @@ import attr
 import numpy as np
 import rasterio
 import tensorflow as tf
+from sklearn.preprocessing import minmax_scale
 from tensorflow.compat.v1.keras import backend as K
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (
@@ -23,7 +24,6 @@ from tensorflow.keras.layers import (
     concatenate,
 )
 from tensorflow.keras.models import Model
-from sklearn.preprocessing import minmax_scale
 
 from unetseg.utils import resize
 
@@ -33,6 +33,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 @attr.s
 class TrainConfig:
     images_path = attr.ib()
+    masks_path = attr.ib(default=None)
     width = attr.ib(default=200)
     height = attr.ib(default=200)
     n_channels = attr.ib(default=3)
@@ -619,7 +620,7 @@ def train(cfg: TrainConfig):
     if not test_images:
         raise RuntimeError("test_images is empty")
 
-    mask_dir = os.path.join(cfg.images_path, "masks")
+    mask_dir = cfg.masks_path or os.path.join(cfg.images_path, "masks")
     train_generator = build_data_generator(train_images, config=cfg, mask_dir=mask_dir)
     val_generator = build_data_generator(val_images, config=cfg, mask_dir=mask_dir)
     test_generator = build_data_generator(test_images, config=cfg, mask_dir=mask_dir)
