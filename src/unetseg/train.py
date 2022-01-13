@@ -620,7 +620,7 @@ def train(cfg: TrainConfig):
     if not test_images:
         raise RuntimeError("test_images is empty")
 
-    mask_dir = cfg.masks_path or os.path.join(cfg.images_path, "masks")
+    mask_dir = cfg.masks_path or os.path.join(cfg.images_path, "extent")
     train_generator = build_data_generator(train_images, config=cfg, mask_dir=mask_dir)
     val_generator = build_data_generator(val_images, config=cfg, mask_dir=mask_dir)
     test_generator = build_data_generator(test_images, config=cfg, mask_dir=mask_dir)
