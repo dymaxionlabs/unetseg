@@ -42,7 +42,7 @@ def plot_data_generator(
 
     images_dir = os.path.join(train_config.images_path, "images")
     mask_dir = train_config.masks_path or os.path.join(
-        train_config.images_path, "masks"
+        train_config.images_path, "extent"
     )
 
     images = glob(os.path.join(images_dir, "*.tif"))
