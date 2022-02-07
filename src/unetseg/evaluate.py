@@ -74,7 +74,7 @@ def plot_data_generator(
     plot_samples(plt, data_generator, num_samples)
     plt.show()
 
-def plot_data_results(
+def plot_data_results_(
     num_samples: int = 3,
     fig_size=(20, 10),
     *,
@@ -104,12 +104,13 @@ def plot_data_results(
     images = random.sample(images, num_samples)
     for img_file in images:
         try:
+            if n_bands not in (1, 3):
+                raise RuntimeError("n_bands option must be 1 or 3")
+            
             fig, axes = plt.subplots(
                 nrows=1, ncols=predict_config.n_classes + 1, figsize=(20, 40)
             )
-            
-            if n_bands !=1 and n_bands != 3: print("n_bands option bust be 1 or 3")
-                
+                 
             if n_bands == 1:
           
                 img_s2 = tiff.imread(
