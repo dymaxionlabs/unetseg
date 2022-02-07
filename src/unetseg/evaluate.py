@@ -74,7 +74,7 @@ def plot_data_generator(
     plot_samples(plt, data_generator, num_samples)
     plt.show()
 
-def plot_data_results_(
+def plot_data_results(
     num_samples: int = 3,
     fig_size=(20, 10),
     *,
