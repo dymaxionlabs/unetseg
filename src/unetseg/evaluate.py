@@ -74,17 +74,16 @@ def plot_data_generator(
     plot_samples(plt, data_generator, num_samples)
     plt.show()
 
-
 def plot_data_results(
     num_samples: int = 3,
     fig_size=(20, 10),
     *,
     predict_config: PredictConfig,
-    img_ch: int = 3
+    img_ch: int = 3,
+    n_bands: int = 3
 ):
     """
     Plots some samples from the results directory.
-
     Parameters
     ----------
     num_samples : int
@@ -95,7 +94,6 @@ def plot_data_results(
         Number of channels.
     predict_config : PredictConfig
         Prediction onfiguration object.
-
     """
 
     images = [
@@ -106,32 +104,31 @@ def plot_data_results(
     images = random.sample(images, num_samples)
     for img_file in images:
         try:
-
-            if predict_config.n_channels < 3:
-
+            fig, axes = plt.subplots(
+                nrows=1, ncols=predict_config.n_classes + 1, figsize=(20, 40)
+            )
+            
+            if n_bands !=1 and n_bands != 3: print("n_bands option bust be 1 or 3")
+                
+            if n_bands == 1:
+          
                 img_s2 = tiff.imread(
                     os.path.join(predict_config.images_path, "images", img_file)
-                )
-
-                img_s2 = minmax_scale(img_s2.ravel(), feature_range=(0, 255)).reshape(
-                    img_s2.shape
-                )
-
-            else:
+                )[:, :, img_ch]
+                axes[0].imshow(img_s2)
+               
+            if n_bands == 3:
+             
                 img_s2 = tiff.imread(
                     os.path.join(predict_config.images_path, "images", img_file)
-                )[:, :, :img_ch]
-
-                img_s2 = minmax_scale(img_s2.ravel(), feature_range=(0, 255)).reshape(
-                    img_s2.shape
-                )
-
+                )[:, :, :3]
+                axes[0].imshow(img_s2)
+            
             # Prediccion
             mask_ = (
                 tiff.imread(os.path.join(predict_config.results_path, img_file)) / 255
             )
-            mask_ = np.rollaxis(mask_, 0, 3)
-
+   
             mask_ = resize(
                 mask_,
                 (predict_config.height, predict_config.width, predict_config.n_classes),
@@ -139,10 +136,9 @@ def plot_data_results(
                 preserve_range=True,
             )
 
-            fig, axes = plt.subplots(
-                nrows=1, ncols=predict_config.n_classes + 1, figsize=(20, 40)
-            )
-            axes[0].imshow(img_s2)
+          
+           
+            
 
             for c in range(predict_config.n_classes):
                 axes[1 + c].imshow(np.squeeze(mask_[:, :, c]))
