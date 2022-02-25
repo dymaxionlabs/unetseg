@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tifffile as tiff
 from skimage.transform import resize
-from sklearn.preprocessing import minmax_scale
 
 from unetseg.predict import PredictConfig
 from unetseg.train import TrainConfig, build_data_generator
@@ -74,6 +73,7 @@ def plot_data_generator(
     plot_samples(plt, data_generator, num_samples)
     plt.show()
 
+
 def plot_data_results(
     num_samples: int = 3,
     fig_size=(20, 10),
@@ -106,40 +106,36 @@ def plot_data_results(
         try:
             if n_bands not in (1, 3):
                 raise RuntimeError("n_bands option must be 1 or 3")
-            
+
             fig, axes = plt.subplots(
                 nrows=1, ncols=predict_config.n_classes + 1, figsize=(20, 40)
             )
-                 
+
             if n_bands == 1:
-          
+
                 img_s2 = tiff.imread(
                     os.path.join(predict_config.images_path, "images", img_file)
                 )[:, :, img_ch]
                 axes[0].imshow(img_s2)
-               
+
             if n_bands == 3:
-             
+
                 img_s2 = tiff.imread(
                     os.path.join(predict_config.images_path, "images", img_file)
                 )[:, :, :3]
                 axes[0].imshow(img_s2)
-            
+
             # Prediccion
             mask_ = (
                 tiff.imread(os.path.join(predict_config.results_path, img_file)) / 255
             )
-   
+
             mask_ = resize(
                 mask_,
                 (predict_config.height, predict_config.width, predict_config.n_classes),
                 mode="constant",
                 preserve_range=True,
             )
-
-          
-           
-            
 
             for c in range(predict_config.n_classes):
                 axes[1 + c].imshow(np.squeeze(mask_[:, :, c]))
