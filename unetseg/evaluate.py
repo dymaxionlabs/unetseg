@@ -36,8 +36,6 @@ def plot_data_generator(
 
     if train_config.n_channels < 4:
         img_ch = train_config.n_channels
-    else:
-        img_ch = img_ch
 
     images_dir = os.path.join(train_config.images_path, "images")
     mask_dir = train_config.masks_path or os.path.join(
