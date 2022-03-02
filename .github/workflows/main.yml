@@ -19,19 +19,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest]
 
     steps:
       - name: Install dependencies (GDAL)
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt install libgdal-dev gdal-bin
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install gdal
-          else
-            echo "$RUNNER_OS not supported"
-            exit 1
-          fi
+          sudo apt install libgdal-dev gdal-bin
           gdal-config --version
         shell: bash
 

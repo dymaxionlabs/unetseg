@@ -1,3 +1,4 @@
+import math
 import os
 import random
 import warnings
@@ -648,9 +649,8 @@ def train(cfg: TrainConfig):
 
     # Evaluate model on test set
     if cfg.evaluate:
-        scores = model.evaluate(
-            test_generator, steps=len(test_images) // cfg.batch_size
-        )
+        steps = math.ceil(len(test_images) / cfg.batch_size)
+        scores = model.evaluate(test_generator, steps=steps)
         loss, mean_iou = scores
         print("*** Final  metrics ***")
         print("Loss:", loss)
