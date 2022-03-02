@@ -1,29 +1,15 @@
+# unetseg
+
+U-Net semantic segmentation for satellite imagery
+
+[![Pypi](https://img.shields.io/pypi/v/unetseg.svg)](https://pypi.python.org/pypi/unetseg)
+[![CI](https://github.com/dymaxionlabs/unetseg/actions/workflows/main.yml/badge.svg)](https://github.com/dymaxionlabs/unetseg/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/dymaxionlabs/unetseg/branch/main/graph/badge.svg?token=M092LPM03I)](https://codecov.io/gh/dymaxionlabs/unetseg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dymaxionlabs_unetseg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=dymaxionlabs_unetseg)
+[![Issues](https://img.shields.io/github/issues-closed/dymaxionlabs/unetseg)](https://github.com/dymaxionlabs/unetseg/issues)
+[![License](https://img.shields.io/github/license/dymaxionlabs/unetseg)](LICENSE.txt)
+
 _This digital tool is part of the catalog of tools of the **Inter-American Development Bank**. You can learn more about the IDB initiative at [code.iadb.org](https://code.iadb.org)_
-
-<p align="center">
-  <img height=200 src="https://user-images.githubusercontent.com/71611391/124545932-42fa5380-de00-11eb-932e-a5af36d3bbfb.png">
-</p>
-
-<h1 align="center">unetseg</h1>
-
-<p align="center">
-  U-Net semantic segmentation for satellite imagery
-</p>
-
-<p align="center">
-  <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/dymaxionlabs/unetseg"></a>
-  <a href="https://github.com/dymaxionlabs/unetseg/releases"><img src="https://img.shields.io/github/v/tag/dymaxionlabs/unetseg"></a>
-  <a href="https://sonarcloud.io/dashboard?id=dymaxionlabs_unetseg"><img src="https://sonarcloud.io/api/project_badges/measure?project=dymaxionlabs_unetseg&metric=alert_status"></a>
-</p>
-
-<p  align="center"> •
-  <a  href="#information_source-description">Description</a> •
-  <a  href="#handshake-contributing">Contributing</a> •
-  <a  href="#man_technologist-authors">Authors</a> •
-  <a  href="#page_facing_up-license">License</a> •
-</p>
-
-<br>
 
 ## :information_source: Description
 
@@ -33,27 +19,27 @@ on the U-Net architecture, using [Tensorflow](https://www.tensorflow.org/) and [
 This implementation is tuned specifically for satellite imagery and other
 geospatial raster data.
 
-<br>
+## :open_book: Documentation
+
+* [Stable](https://unetseg.readthedocs.io/en/stable/)
+* [Latest](https://unetseg.readthedocs.io/en/latest/)
 
 ## :handshake: Contributing
 
+* [Report bugs/feature requests](https://github.com/dymaxionlabs/unetseg/issues)
+* [Ask questions](https://github.com/dymaxionlabs/unetseg/discussions)
+
 Bug reports and pull requests are welcome on GitHub at the [issues
-page](https://github.com/dymaxionlabs/unetseg/issues). This project is intended to be
+page](https://github.com/dymaxionlabs/unetseg). This project is intended to be
 a safe, welcoming space for collaboration, and contributors are expected to
 adhere to the [Contributor Covenant](http://contributor-covenant.org) code of
 conduct.
 
-<br>
+<a href="https://github.com/dymaxionlabs/unetseg/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dymaxionlabs/unetseg" />
+</a>
 
-## :man_technologist: Authors
-
-- Damián Silvani: <damian@dymaxionlabs.com>
-- María Roberta Devesa: <ro.devesa@dymaxionlabs.com>
-- Gessica Paniagua: <gessica@dymaxionlabs.com>
-- Federico Bayle: <federico@dymaxionlabs.com>
-- Alan Toris
-
-<br>
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## :page_facing_up: License
 
