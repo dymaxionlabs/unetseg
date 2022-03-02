@@ -24,10 +24,12 @@ geospatial raster data.
 * [Stable](https://unetseg.readthedocs.io/en/stable/)
 * [Latest](https://unetseg.readthedocs.io/en/latest/)
 
-## :handshake: Contributing
+## :question: Bugs / Questions
 
 * [Report bugs/feature requests](https://github.com/dymaxionlabs/unetseg/issues)
 * [Ask questions](https://github.com/dymaxionlabs/unetseg/discussions)
+
+## :handshake: Contributing
 
 Bug reports and pull requests are welcome on GitHub at the [issues
 page](https://github.com/dymaxionlabs/unetseg). This project is intended to be
