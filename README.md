@@ -11,7 +11,7 @@ U-Net semantic segmentation for satellite imagery
 
 _This digital tool is part of the catalog of tools of the **Inter-American Development Bank**. You can learn more about the IDB initiative at [code.iadb.org](https://code.iadb.org)_
 
-## :information_source: Description
+## Description
 
 A set of classes and CLI tools for training a semantic segmentation model based
 on the U-Net architecture, using [Tensorflow](https://www.tensorflow.org/) and [Keras](https://keras.io/).
@@ -19,17 +19,17 @@ on the U-Net architecture, using [Tensorflow](https://www.tensorflow.org/) and [
 This implementation is tuned specifically for satellite imagery and other
 geospatial raster data.
 
-## :open_book: Documentation
+## Documentation
 
 * [Stable](https://unetseg.readthedocs.io/en/stable/)
 * [Latest](https://unetseg.readthedocs.io/en/latest/)
 
-## :question: Bugs / Questions
+## Bugs / Questions
 
 * [Report bugs/feature requests](https://github.com/dymaxionlabs/unetseg/issues)
 * [Ask questions](https://github.com/dymaxionlabs/unetseg/discussions)
 
-## :handshake: Contributing
+## Contributing
 
 Bug reports and pull requests are welcome on GitHub at the [issues
 page](https://github.com/dymaxionlabs/unetseg). This project is intended to be
@@ -43,6 +43,6 @@ conduct.
 
 Made with [contrib.rocks](https://contrib.rocks).
 
-## :page_facing_up: License
+## License
 
 This project is licensed under Apache 2.0. Refer to [LICENSE.txt](LICENSE.txt).
