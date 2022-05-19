@@ -8,6 +8,7 @@ U-Net semantic segmentation for satellite imagery
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dymaxionlabs_unetseg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=dymaxionlabs_unetseg)
 [![Issues](https://img.shields.io/github/issues-closed/dymaxionlabs/unetseg)](https://github.com/dymaxionlabs/unetseg/issues)
 [![License](https://img.shields.io/github/license/dymaxionlabs/unetseg)](https://github.com/dymaxionlabs/unetseg/blob/main/LICENSE.txt)
+[![Join the chat at https://gitter.im/dymaxionlabs/unetseg](https://badges.gitter.im/dymaxionlabs/unetseg.svg)](https://gitter.im/dymaxionlabs/unetseg?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 _This digital tool is part of the catalog of tools of the **Inter-American Development Bank**. You can learn more about the IDB initiative at [code.iadb.org](https://code.iadb.org)_
 
@@ -27,7 +28,7 @@ geospatial raster data.
 ## Bugs / Questions
 
 * [Report bugs/feature requests](https://github.com/dymaxionlabs/unetseg/issues)
-* [Ask questions](https://github.com/dymaxionlabs/unetseg/discussions)
+* [Ask questions](https://gitter.im/dymaxionlabs/satproc)
 
 ## Contributing
 
