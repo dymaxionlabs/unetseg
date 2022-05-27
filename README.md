@@ -28,7 +28,7 @@ geospatial raster data.
 ## Bugs / Questions
 
 * [Report bugs/feature requests](https://github.com/dymaxionlabs/unetseg/issues)
-* [Ask questions](https://gitter.im/dymaxionlabs/satproc)
+* [Ask questions in our chat room](https://gitter.im/dymaxionlabs/satproc)
 
 ## Contributing
 
