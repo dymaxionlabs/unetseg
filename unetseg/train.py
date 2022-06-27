@@ -4,7 +4,7 @@ import random
 import warnings
 from glob import glob
 from typing import List, Tuple
-
+from datetime import datetime
 import albumentations as A
 import attr
 import numpy as np
@@ -12,7 +12,7 @@ import rasterio
 import tensorflow as tf
 from sklearn.preprocessing import minmax_scale
 from tensorflow.compat.v1.keras import backend as K
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard,CSVLogger
 from tensorflow.keras.layers import (
     BatchNormalization,
     Conv2D,
@@ -582,6 +582,13 @@ def train(cfg: TrainConfig):
         Configuration object containing all the necessary parameters for training.
 
     """
+    #Save date and time
+    # datetime object containing current date and time
+    now = datetime.now()
+    dt_string = now.strftime("Date_%d-%m-%Y_Time_%H-%M-%S")
+
+    
+    
     if cfg.seed:
         random.seed = cfg.seed
         np.random.seed = cfg.seed
@@ -632,6 +639,13 @@ def train(cfg: TrainConfig):
     print("Compile and fit the UNet model")
     early_stopping = EarlyStopping(patience=cfg.early_stopping_patience, verbose=1)
     checkpoint = ModelCheckpoint(cfg.model_path, verbose=1, save_best_only=True)
+    
+    head, tail = os.path.split(cfg.model_path)
+    log_file = tail[:-3]
+    print(log_file)
+    os.makedirs('./../logs', exist_ok=True)
+    log_csv = CSVLogger ( f'./../logs/my_logs.csv',separator = ',',append=False)
+    tensorboard = TensorBoard(log_dir = f'./../logs/{log_file}_{dt_string}')
     # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
     #                               patience=5, min_lr=0.001)
 
@@ -641,7 +655,7 @@ def train(cfg: TrainConfig):
         steps_per_epoch=cfg.steps_per_epoch,
         validation_data=val_generator,
         validation_steps=round(cfg.steps_per_epoch * cfg.validation_split),
-        callbacks=[early_stopping, checkpoint],
+        callbacks=[early_stopping, checkpoint,tensorboard,log_csv],
     )
 
     # Save model
