@@ -2,11 +2,11 @@ import math
 import os
 import random
 import warnings
+from dataclasses import dataclass
 from glob import glob
 from typing import List, Tuple
 from datetime import datetime
 import albumentations as A
-import attr
 import numpy as np
 import rasterio
 import tensorflow as tf
@@ -31,26 +31,26 @@ from unetseg.utils import resize
 warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
 
-@attr.s
+@dataclass
 class TrainConfig:
-    images_path = attr.ib()
-    masks_path = attr.ib(default=None)
-    width = attr.ib(default=200)
-    height = attr.ib(default=200)
-    n_channels = attr.ib(default=3)
-    n_classes = attr.ib(default=1)
-    apply_image_augmentation = attr.ib(default=True)
-    model_path = attr.ib(default="unet.h5")
-    model_architecture = attr.ib(default="unet")
-    validation_split = attr.ib(default=0.1)
-    test_split = attr.ib(default=0.1)
-    epochs = attr.ib(default=15)
-    steps_per_epoch = attr.ib(default=2000)
-    early_stopping_patience = attr.ib(default=3)
-    batch_size = attr.ib(default=32)
-    seed = attr.ib(default=None)
-    evaluate = attr.ib(default=True)
-    class_weights = attr.ib(default=0)
+    images_path: str
+    masks_path: str
+    width: int = 200
+    height: int = 200
+    n_channels: int = 3
+    n_classes: int = 1
+    apply_image_augmentation: bool = True
+    model_path: str = "unet.h5"
+    model_architecture: str = "unet"
+    validation_split: float = 0.1
+    test_split: float = 0.1
+    epochs: int = 15
+    steps_per_epoch: int = 2000
+    early_stopping_patience: int = 3
+    batch_size: int = 32
+    seed: int = None
+    evaluate: bool = True
+    class_weights: List[float] = []
 
 
 def build_model_unetplusplus(cfg: TrainConfig) -> Model:
@@ -68,8 +68,8 @@ def build_model_unetplusplus(cfg: TrainConfig) -> Model:
         The U-Net++ model.
 
     """
-    # NOTE: for now, classes are equally balanced
-    if cfg.class_weights == 0:
+    # Classes are equally balanced by default
+    if not cfg.class_weights:
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
 
     # growth_factor = 2
@@ -268,8 +268,8 @@ def build_model_unet(cfg: TrainConfig) -> Model:
         U-Net model class.
 
     """
-    # NOTE: for now, classes are equally balanced
-    if cfg.class_weights == 0:
+    # Classes are equally balanced by default
+    if not cfg.class_weights:
         cfg.class_weights = [0.5 for _ in range(cfg.n_classes)]
 
     growth_factor = 2

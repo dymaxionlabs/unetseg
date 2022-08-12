@@ -1,8 +1,9 @@
 import os
 import warnings
+from dataclasses import dataclass
 from glob import glob
+from typing import List
 
-import attr
 import numpy as np
 import rasterio
 from sklearn.preprocessing import minmax_scale
@@ -14,18 +15,18 @@ from unetseg.utils import grouper, resize
 warnings.filterwarnings("ignore", category=UserWarning, module="skimage")
 
 
-@attr.s
+@dataclass
 class PredictConfig:
-    images_path = attr.ib(default="")
-    results_path = attr.ib(default="")
-    batch_size = attr.ib(default=32)
-    model_architecture = attr.ib(default="unet")
-    model_path = attr.ib(default="unet.h5")
-    height = attr.ib(default=320)
-    width = attr.ib(default=320)
-    n_channels = attr.ib(default=3)
-    n_classes = attr.ib(default=1)
-    class_weights = attr.ib(default=0)
+    images_path: str
+    results_path: str = "."
+    batch_size: int = 32
+    model_architecture: str = "unet"
+    model_path: str = "unet.h5"
+    height: int = 320
+    width: int = 320
+    n_channels: int = 3
+    n_classes: int = 1
+    class_weights: List[float] = []
 
 
 def predict(cfg: PredictConfig):
