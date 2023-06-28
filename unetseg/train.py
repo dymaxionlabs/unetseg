@@ -2,7 +2,7 @@ import math
 import os
 import random
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 from glob import glob
 from typing import List, Tuple
 from datetime import datetime
@@ -50,7 +50,7 @@ class TrainConfig:
     batch_size: int = 32
     seed: int = None
     evaluate: bool = True
-    class_weights: List[float] = []
+    class_weights: List[float] = field(default_factory=list)
 
 
 def build_model_unetplusplus(cfg: TrainConfig) -> Model:
