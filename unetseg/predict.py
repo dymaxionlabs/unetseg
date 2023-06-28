@@ -1,6 +1,6 @@
 import os
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 from glob import glob
 from typing import List
 
@@ -26,7 +26,8 @@ class PredictConfig:
     width: int = 320
     n_channels: int = 3
     n_classes: int = 1
-    class_weights: List[float] = []
+    class_weights: List[float] = field(default_factory=list)
+
 
 
 def predict(cfg: PredictConfig):
