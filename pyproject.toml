@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unetseg"
-version = "0.2.3"
+version = "0.2.4"
 description = "U-Net semantic segmentation for satellite imagery"
 authors = ["Damián Silvani <munshkr@gmail.com>"]
 license = "Apache-2.0"
